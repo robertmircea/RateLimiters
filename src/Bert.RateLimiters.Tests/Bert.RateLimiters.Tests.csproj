@@ -35,6 +35,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Should">
+      <HintPath>..\..\packages\Should.1.1.20\lib\Should.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,6 +49,7 @@
   <ItemGroup>
     <Compile Include="FixedTokenBucketTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RollingWindowThrottlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

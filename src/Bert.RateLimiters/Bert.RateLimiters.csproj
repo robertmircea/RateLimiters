@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RollingWindowThrottler.cs" />
     <Compile Include="SystemTime.cs" />
     <Compile Include="FixedTokenBucket.cs" />
     <Compile Include="IThrottleStrategy.cs" />
