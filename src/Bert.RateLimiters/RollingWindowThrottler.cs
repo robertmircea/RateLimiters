@@ -7,7 +7,7 @@ using System.Linq;
 namespace Bert.RateLimiters
 {
     /// <summary>
-    /// Used to control the rate of reservations/occurrences per unit of time.
+    /// Used to control the rate of occurrences of an action per unit of time.
     /// </summary>
     /// <remarks>
     /// The algorithm uses a rolling time window so that precise control over the rate is achieved (without any bursts)
@@ -18,14 +18,15 @@ namespace Bert.RateLimiters
         private readonly long timeUnitTicks;
         private readonly object syncRoot = new object();
         private int remainingTokens;
-        private readonly Queue<long> exitTimesInTicksQueue = new Queue<long>();
+        //provides a queue of timestamps expressed in ticks when reservations expire
+        private readonly Queue<long> expirationTimestampsQueue;
         private long nextCheckTime;
 
         /// <summary>
         /// Constructs an instance of the throttler.
         /// </summary>
-        /// <param name="occurrences">Maximum number of reservation which can be made</param>
-        /// <param name="timeUnit">The time unit in which the reservations can be made</param>
+        /// <param name="occurrences">Maximum number of occurences per time unit allowed.</param>
+        /// <param name="timeUnit">The time unit in which the occurences are constrained.</param>
         public RollingWindowThrottler(int occurrences, TimeSpan timeUnit)
         {
             if(occurrences<=0)
@@ -35,11 +36,12 @@ namespace Bert.RateLimiters
             this.occurrences = occurrences;
             timeUnitTicks = timeUnit.Ticks;
             remainingTokens = occurrences;
+            expirationTimestampsQueue = new Queue<long>(occurrences);
         }
 
 
         /// <summary>
-        /// Total number of reservations which can be made for a time unit
+        /// Total number of occurrences of an action which are allowed for a time unit
         /// </summary>
         public int Occurrences
         {
@@ -47,7 +49,7 @@ namespace Bert.RateLimiters
         }
 
         /// <summary>
-        /// The time unit in which the maximal number of <see cref="Occurrences"/> can be reserved.
+        /// The time unit in which the maximal number of <see cref="Occurrences"/> are allowed..
         /// </summary>
         public TimeSpan TimeUnit
         {
@@ -71,7 +73,7 @@ namespace Bert.RateLimiters
         /// <summary>
         /// Tries to reserve one token in the configured time unit.
         /// </summary>
-        /// <param name="waitTimeMillis">total suggested wait time till tokens will become available for reservation</param>
+        /// <param name="waitTimeMillis">total suggested wait time in milliseconds till tokens will become available for reservation</param>
         /// <returns>true if the caller should throttle/wait, or false if reservation was made successfully.</returns>
         public bool ShouldThrottle(out long waitTimeMillis)
         {
@@ -83,7 +85,7 @@ namespace Bert.RateLimiters
         /// Tries to reserve <see cref="tokens"/> in the configured time unit.
         /// </summary>
         /// <param name="tokens">total number of reservations</param>
-        /// <param name="waitTimeMillis">total suggested wait time till tokens will become available for reservation</param>
+        /// <param name="waitTimeMillis">total suggested wait time in milliseconds till tokens will become available for reservation</param>
         /// <returns>true if the caller should throttle/wait, or false if reservation was made successfully.</returns>
         public bool ShouldThrottle(int tokens, out long waitTimeMillis)
         {
@@ -99,7 +101,7 @@ namespace Bert.RateLimiters
                     waitTimeMillis = 0;
                     long timeToExit = unchecked (currentTime + timeUnitTicks);
                     for (int i = 0; i < tokens; i++)
-                        exitTimesInTicksQueue.Enqueue(timeToExit);
+                        expirationTimestampsQueue.Enqueue(timeToExit);
                     return false;
                 }
 
@@ -108,21 +110,21 @@ namespace Bert.RateLimiters
             }
         }
 
-        public void CheckExitTimeQueue()
+        private void CheckExitTimeQueue()
         {
             if(nextCheckTime > SystemTime.UtcNow.Ticks)
                 return;
 
-            while (exitTimesInTicksQueue.Count > 0 && exitTimesInTicksQueue.Peek() <= SystemTime.UtcNow.Ticks)
+            while (expirationTimestampsQueue.Count > 0 && expirationTimestampsQueue.Peek() <= SystemTime.UtcNow.Ticks)
             {
-                exitTimesInTicksQueue.Dequeue();
+                expirationTimestampsQueue.Dequeue();
                 remainingTokens++;
             }
 
             //try to determine next check time
-            if (exitTimesInTicksQueue.Count > 0)
+            if (expirationTimestampsQueue.Count > 0)
             {
-                var item = exitTimesInTicksQueue.Peek();
+                var item = expirationTimestampsQueue.Peek();
                 nextCheckTime = item;
             }
             else
