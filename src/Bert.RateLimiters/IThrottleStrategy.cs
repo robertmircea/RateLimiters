@@ -1,11 +1,12 @@
-﻿namespace Bert.RateLimiters
+﻿using System;
+
+namespace Bert.RateLimiters
 {
     public interface IThrottleStrategy
     {
-        bool ShouldThrottle(long n);
-        bool ShouldThrottle();
-        bool ShouldThrottle(long n, out int waitTime);
-        bool ShouldThrottle(out int waitTime);
+        bool ShouldThrottle(long n = 1);
+        bool ShouldThrottle(long n, out TimeSpan waitTime);
+        bool ShouldThrottle(out TimeSpan waitTime);
         long CurrentTokenCount { get; }
     }
 }

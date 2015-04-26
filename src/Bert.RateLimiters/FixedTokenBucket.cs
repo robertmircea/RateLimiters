@@ -4,15 +4,8 @@ namespace Bert.RateLimiters
 {
     public class FixedTokenBucket : TokenBucket
     {
-        private readonly long ticksRefillInterval;
-        private long nextRefillTime;
-
-        public FixedTokenBucket(long maxTokens, long refillInterval, long refillIntervalInMilliSeconds) : base(maxTokens)
+        public FixedTokenBucket(long maxTokens, long refillInterval, long refillIntervalInMilliSeconds) : base(maxTokens, refillInterval, refillIntervalInMilliSeconds)
         {
-            if (refillInterval < 0) throw new ArgumentOutOfRangeException("refillInterval", "Refill interval cannot be negative");
-            if (refillIntervalInMilliSeconds <= 0) throw new ArgumentOutOfRangeException("refillIntervalInMilliSeconds", "Refill interval in milliseconds cannot be negative");
-
-            ticksRefillInterval = TimeSpan.FromMilliseconds(refillInterval * refillIntervalInMilliSeconds).Ticks;
         }
 
         protected override void UpdateTokens()

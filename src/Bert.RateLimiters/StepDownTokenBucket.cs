@@ -10,7 +10,7 @@ namespace Bert.RateLimiters
 
         protected override void UpdateTokens()
         {
-             var currentTime = SystemTime.UtcNow.Ticks;
+            var currentTime = SystemTime.UtcNow.Ticks;
 
             if (currentTime >= nextRefillTime)
             {

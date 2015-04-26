@@ -23,7 +23,7 @@ namespace Bert.RateLimiters.Tests
         [Test]
         public void ShouldThrottle_WhenCalledWithNTokensLessThanMax_ReturnsFalse()
         {
-            int waitTime;
+            TimeSpan waitTime;
             var shouldThrottle = bucket.ShouldThrottle(N_LESS_THAN_MAX, out waitTime);
 
             Assert.That(shouldThrottle, Is.False);
@@ -33,10 +33,11 @@ namespace Bert.RateLimiters.Tests
         [Test]
         public void ShouldThrottle_WhenCalledWithNTokensGreaterThanMax_ReturnsTrue()
         {
-            int waitTime;
+            TimeSpan waitTime;
             var shouldThrottle = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
 
             Assert.That(shouldThrottle, Is.True);
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromMilliseconds(REFILL_INTERVAL*1000)));
             Assert.That(bucket.CurrentTokenCount, Is.EqualTo(MAX_TOKENS));
         }
 
@@ -44,10 +45,11 @@ namespace Bert.RateLimiters.Tests
         [Test]
         public void ShouldThrottle_WhenCalledCumulativeNTimesIsLessThanMaxTokens_ReturnsFalse()
         {
-            
             for (int i = 0; i < CUMULATIVE; i++)
             {
-                Assert.That(bucket.ShouldThrottle(N_LESS_THAN_MAX), Is.False);
+                TimeSpan waitTime;
+                Assert.That(bucket.ShouldThrottle(N_LESS_THAN_MAX, out waitTime), Is.False);
+                Assert.That(waitTime, Is.EqualTo(TimeSpan.Zero));
             }
 
             var tokens = bucket.CurrentTokenCount;
@@ -97,16 +99,19 @@ namespace Bert.RateLimiters.Tests
             SystemTime.SetCurrentTimeUtc = () => new DateTime(2014, 2, 27, 0, 0, 0, DateTimeKind.Utc);
             var virtualNow = SystemTime.UtcNow;
 
-            var before = bucket.ShouldThrottle(N_GREATER_THAN_MAX);
+            TimeSpan waitTime;
+            var before = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
             var tokensBefore = bucket.CurrentTokenCount;
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromMilliseconds(REFILL_INTERVAL * 1000)));
             Assert.That(before, Is.True);
             Assert.That(tokensBefore, Is.EqualTo(MAX_TOKENS));
 
             SystemTime.SetCurrentTimeUtc = () => virtualNow.AddSeconds(REFILL_INTERVAL);
 
-            var after = bucket.ShouldThrottle(N_GREATER_THAN_MAX);
+            var after = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
             var tokensAfter = bucket.CurrentTokenCount;
             Assert.That(after, Is.True);
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.Zero));
             Assert.That(tokensAfter, Is.EqualTo(MAX_TOKENS));
         }
 
