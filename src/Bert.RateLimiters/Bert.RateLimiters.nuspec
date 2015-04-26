@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Bert.RateLimiters</id>
-    <version>1.0.0</version>
+    <version>$version$</version>
     <authors>Robert Mircea</authors>
     <owners>Robert Mircea</owners>
     <licenseUrl>https://raw.githubusercontent.com/robertmircea/RateLimiters/master/LICENSE</licenseUrl>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Popular rate limiting algorithms. C# implementations of fixed token bucket and leaky token bucket throttling strategies</description>
     <releaseNotes>First version</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <copyright>Copyright 2014-2015</copyright>
     <tags>ratelimiting throttling leakybucket tokenbucket</tags>
   </metadata>
 </package>
