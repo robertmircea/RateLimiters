@@ -102,16 +102,16 @@ namespace Bert.RateLimiters.Tests
             TimeSpan waitTime;
             var before = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
             var tokensBefore = bucket.CurrentTokenCount;
-            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromMilliseconds(REFILL_INTERVAL * 1000)));
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromSeconds(REFILL_INTERVAL)));
             Assert.That(before, Is.True);
             Assert.That(tokensBefore, Is.EqualTo(MAX_TOKENS));
 
-            SystemTime.SetCurrentTimeUtc = () => virtualNow.AddSeconds(REFILL_INTERVAL);
+            SystemTime.SetCurrentTimeUtc = () => virtualNow.AddSeconds(REFILL_INTERVAL+1);
 
             var after = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
             var tokensAfter = bucket.CurrentTokenCount;
             Assert.That(after, Is.True);
-            Assert.That(waitTime, Is.EqualTo(TimeSpan.Zero));
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromSeconds(REFILL_INTERVAL-1)));
             Assert.That(tokensAfter, Is.EqualTo(MAX_TOKENS));
         }
 
