@@ -111,8 +111,24 @@ namespace Bert.RateLimiters.Tests
             var after = bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
             var tokensAfter = bucket.CurrentTokenCount;
             Assert.That(after, Is.True);
-            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromSeconds(REFILL_INTERVAL-1)));
+            Assert.That(waitTime, Is.EqualTo(TimeSpan.FromSeconds(REFILL_INTERVAL)));
             Assert.That(tokensAfter, Is.EqualTo(MAX_TOKENS));
+        }
+
+        [Test]
+        public void ShouldThrottle_WhenThrottle_WaitTimeIsDynamicallyCalculated()
+        {
+            var virtualTime = new DateTime(2014, 2, 27, 0, 0, 0, DateTimeKind.Utc);
+
+            for (int i = 0; i < 3; i++)
+            {
+                int closureI = i;
+                SystemTime.SetCurrentTimeUtc = () => virtualTime.AddSeconds(closureI*3);
+                TimeSpan waitTime;
+                bucket.ShouldThrottle(N_GREATER_THAN_MAX, out waitTime);
+                Assert.That(waitTime, Is.EqualTo(TimeSpan.FromSeconds(10-i*3)));
+            }
+
         }
 
 
