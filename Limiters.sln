@@ -7,12 +7,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bert.RateLimiters", "src\Be
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bert.RateLimiters.Tests", "src\Bert.RateLimiters.Tests\Bert.RateLimiters.Tests.csproj", "{178AB826-2A29-4359-B1FE-6E9E3A8B625B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{E957CCFF-C527-4156-81B3-A7CC6BCD292A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E957CCFF-C527-4156-81B3-A7CC6BCD292A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E957CCFF-C527-4156-81B3-A7CC6BCD292A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E4D1740-6C89-4E71-8B56-D092DB6E0BF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E4D1740-6C89-4E71-8B56-D092DB6E0BF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E4D1740-6C89-4E71-8B56-D092DB6E0BF9}.Release|Any CPU.ActiveCfg = Release|Any CPU

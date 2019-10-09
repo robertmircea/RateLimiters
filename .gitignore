@@ -34,3 +34,5 @@ _ReSharper*/
 [Bb]uild_artifacts
 _NCrunch_*/
 .vs/
+output/
+.idea/
