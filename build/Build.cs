@@ -94,7 +94,7 @@ class Build : NukeBuild
     Target Publish => _ => _
         .DependsOn(Pack)
         .Requires(() => ApiKey)
-        .Requires(() => Configuration.Release)
+        .Requires(() => Equals(Configuration, Configuration.Release))
         .Executes(() =>
         {
             GlobFiles(OutputDirectory, "*.nupkg").NotEmpty()
